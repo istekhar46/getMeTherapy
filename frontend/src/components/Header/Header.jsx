@@ -88,7 +88,7 @@ const Header = () => {
             </div>
 
             <Link to="/login">
-              <button className="bg-primaryColor py-2 px-6 text-black font-[600] h-[44px] items-center justify-center rounded-[50px]">
+              <button className="bg-primaryColor py-2 px-6 text-white font-[600] h-[44px] items-center justify-center rounded-[50px]">
                 Login
               </button>
             </Link>
