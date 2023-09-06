@@ -13,7 +13,7 @@ const socialLinks = [
     icon: <AiFillGithub className="group-hover:text-white w-4 h-5" />,
   },
   {
-    path: "https://www.instagram.com/in/istekhar_khan46",
+    path: "https://www.instagram.com/istekhar_khan46/",
     icon: <AiFillInstagram className="group-hover:text-white w-4 h-5" />,
   },
 ];
@@ -85,7 +85,7 @@ const Footer = () => {
           <div>
             <img src={logo} alt="img" />
             <p className="text-[16px] leading-7 font-[400] text-textColor mt-4">
-              copyright "Copr."; {year} developed by Istekhar khan all rights
+              copyright © {year} developed by <a className="font-[800]" target="_blanck" href="https://www.linkedin.com/in/istekhar46">Istekhar khan </a> all rights
               reserved.
             </p>
 
