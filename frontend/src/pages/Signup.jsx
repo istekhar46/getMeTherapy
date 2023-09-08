@@ -1,40 +1,65 @@
 import signup from "../assets/images/signup.gif";
-import avatar from "../assets/images/avatar-icon.png";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useRegisterMutation } from "../slices/userApiSlice/userApiSlice";
+import { setCredentials } from "../slices/authSlice";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 
 const Signup = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewURL, setPreviewURL] = useState("");
+  // const [selectedFile, setSelectedFile] = useState(null);
+  // const [previewURL, setPreviewURL] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    photo: selectedFile,
+    cnfPassword: "",
     gender: "",
     role: "patient",
   });
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = async(e) => {
-    // const file = e.target.files[0];
-    // setSelectedFile(file);
-    // const fileReader = new FileReader();
-    // fileReader.onload = () => {
-    //   setPreviewURL(fileReader.result);
-    // };
-    // fileReader.readAsDataURL(file);
-    const file = e.target.files[0];
-    console.log(file);
-  }
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const submitHandler = event => {
+  const { userInfo} = useSelector((state) => state.auth);
+  const [register, { isLoading }] = useRegisterMutation();
+
+  // const handleFileChange = async(e) => {
+  //   // const file = e.target.files[0];
+  //   // setSelectedFile(file);
+  //   // const fileReader = new FileReader();
+  //   // fileReader.onload = () => {
+  //   //   setPreviewURL(fileReader.result);
+  //   // };
+  //   // fileReader.readAsDataURL(file);
+  //   const file = e.target.files[0];
+  //   console.log(file);
+  // }
+
+  const submitHandler = async(event) => {
     event.preventDefault();
-    console.log(formData);
-  }
+    if (formData.password !== formData.cnfPassword) {
+      toast.error("password did not match");
+    } else {
+      try {
+        const res = await register({ ...formData }).unwrap();
+        dispatch(setCredentials({ ...res }));
+      } catch (err) {
+        toast.error(err?.data?.message || err.error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  },[userInfo, navigate])
 
   return (
     <section className="px-5 xl:px-0">
@@ -89,6 +114,17 @@ const Signup = () => {
                   className="w-full px-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor rounded-md cursor-pointer"
                 />
               </div>
+              <div className="mb-5">
+                <input
+                  required
+                  type="password"
+                  name="cnfPassword"
+                  value={formData.cnfPassword}
+                  onChange={handleInputChange}
+                  placeholder="confirm Password"
+                  className="w-full px-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor rounded-md cursor-pointer"
+                />
+              </div>
 
               <div className="mb-5 flex items-center justify-between">
                 <label className="text-headingColor font-bold text-[16px] leading-7">
@@ -107,7 +143,7 @@ const Signup = () => {
                 <label className="text-headingColor font-bold text-[16px] leading-7">
                   Gender:
                   <select
-                    name="role"
+                    name="gender"
                     value={formData.gender}
                     onChange={handleInputChange}
                     className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 focus:outline-none"
@@ -120,7 +156,7 @@ const Signup = () => {
                 </label>
               </div>
 
-              <div className="mb-5 flex items-center gap-3">
+              {/* <div className="mb-5 flex items-center gap-3">
                 <figure className="w-[60px] h-[60px] rounded-full border-2 border-solid border-primaryColor flex items-center justify-center">
                   <img src={avatar} alt="img" className="w-full rounded-full" />
                 </figure>
@@ -140,7 +176,8 @@ const Signup = () => {
                     Upload Photo
                   </label>
                 </div>
-              </div>
+              </div> */}
+
               <div className="mt-7">
                 <button className="w-full bg-primaryColor text-white text-[18px] leading-[30px] px-4 py-3 rounded-lg">
                   Sign Up

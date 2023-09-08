@@ -1,8 +1,11 @@
 import logo from "../../assets/images/logo.png";
 import userImg from "../../assets/images/avatar-icon.png";
 import { BiMenu } from "react-icons/bi";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../slices/authSlice";
+import { useLogoutMutation } from "../../slices/userApiSlice/userApiSlice";
 
 const navLinks = [
   {
@@ -26,6 +29,23 @@ const navLinks = [
 const Header = () => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { userInfo } = useSelector((state) => state.auth);
+  const [logoutApiCall, { isloading }] = useLogoutMutation();
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      await logoutApiCall().unwrap();
+      dispatch(logout());
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleStickyHeader = () => {
     window.addEventListener("scroll", () => {
@@ -82,18 +102,40 @@ const Header = () => {
             <div className="hidden">
               <Link to="/">
                 <figure className="w-[35px] h-[35px] rounded-full cursor-pointer">
-                  <img src={userImg} className="w-full rounded-full" alt="image" />
+                  <img
+                    src={userImg}
+                    className="w-full rounded-full"
+                    alt="image"
+                  />
                 </figure>
               </Link>
             </div>
 
-            <Link to="/login">
-              <button className="bg-primaryColor py-2 px-6 text-white font-[600] h-[44px] items-center justify-center rounded-[50px]">
-                Login
-              </button>
-            </Link>
+            {userInfo ? (
+              <>
+                <button
+                  onClick={handleLogout}
+                  className="bg-primaryColor py-2 px-6 text-white font-[600] h-[44px] items-center justify-center rounded-[50px]"
+                >
+                  Logout
+                </button>
+                {userInfo.role === "doctor" && (
+                  <Link to="/dashboard">
+                    <button className="bg-primaryColor py-2 px-6 text-white font-[600] h-[44px] items-center justify-center rounded-[50px]">
+                      Dashboard
+                    </button>
+                  </Link>
+                )}
+              </>
+            ) : (
+              <Link to="/login">
+                <button className="bg-primaryColor py-2 px-6 text-white font-[600] h-[44px] items-center justify-center rounded-[50px]">
+                  Login
+                </button>
+              </Link>
+            )}
 
-            <span className="md:hidden"  onClick={toggleMenu}>
+            <span className="md:hidden" onClick={toggleMenu}>
               <BiMenu className="w-6 h-6 cursor-pointer" />
             </span>
           </div>
