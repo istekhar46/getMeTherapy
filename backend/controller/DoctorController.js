@@ -1,47 +1,84 @@
-const Doctor = require('../models/Doctor');
-const Appointment = require('../models/appointment');
+import asyncHandler from 'express-async-handler';
+import Doctor from '../models/doctorModel.js';
+import { query } from 'express';
+import { populate } from 'dotenv';
 
-// Get doctor's profile and associated appointments
-const getDoctorProfile = async (req, res) => {
-  try {
-    const { doctorId } = req.params;
-    const doctor = await Doctor.findById(doctorId).populate('appointments');
-    
-    if (!doctor) {
-      return res.status(404).json({ error: 'Doctor not found.' });
-    }
 
-    res.status(200).json(doctor);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch doctor profile.' });
+// @Desc    Get Doctor profile..
+// @route   POST /api/Doctors/profile
+// @access  private
+
+const getDoctorProfile = asyncHandler(async (req, res) => {
+
+  const doctor = await Doctor.findById(req.user._id).populate("reviews").select('-password')
+  res.status(200).json({ doctor });
+})
+
+// @Desc    Update Doctor profile..
+// @route   PUT /api/Doctors/profile
+// @access  private
+
+const updateDoctorProfile = asyncHandler(async (req, res) => {
+
+  const doctor = await Doctor.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true }).select('-password')
+
+  if (doctor) {
+
+    res.status(200).json({ doctor })
+
+  } else {
+    res.status(404)
+    throw new Error("Doctor not found")
   }
-};
+})
 
-// Update doctor's profile details
-const updateDoctorProfile = async (req, res) => {
-  try {
-    const { doctorId } = req.params;
-    const updateData = req.body;
 
-    const updatedDoctor = await Doctor.findByIdAndUpdate(
-      doctorId,
-      updateData,
-      { new: true }
-    );
+const deleteDoctorProfile = asyncHandler(async (req, res) => {
 
-    if (!updatedDoctor) {
-      return res.status(404).json({ error: 'Doctor not found.' });
-    }
+  const doctor = await Doctor.findByIdAndDelete(req.params.id)
 
-    res.status(200).json(updatedDoctor);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to update doctor profile.' });
+  if (doctor) {
+
+    res.status(200).json(doctor._id)
+
+  } else {
+    res.status(404)
+    throw new Error("Doctor not found")
   }
-};
+})
 
-module.exports = {
+const getAllDoctors = asyncHandler(async (req, res) => {
+
+  const { query } = req.query;
+
+
+  let doctors;
+
+  if (query) {
+    doctors = await Doctor.find({
+      isApproved: "approved",
+      $or: [
+        { name: { $regex: query, $Option: "i" } },
+        { specialization: { $regex: query, $Option: "i" } }
+      ],
+    }).select('-password')
+  }
+  else {
+    doctors = await Doctor.find({ isApproved: 'approved' }).select('-password')
+  }
+
+  if (doctors) {
+    res.status(200).json({ doctors });
+  }
+  else {
+    res.status(404)
+    throw new Error({ success: false, message: "No Doctors found" });
+  }
+})
+
+export {
   getDoctorProfile,
   updateDoctorProfile,
-};
+  deleteDoctorProfile,
+  getAllDoctors
+}

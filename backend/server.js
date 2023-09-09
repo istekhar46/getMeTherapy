@@ -7,6 +7,8 @@ import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import blogRoutes from './routes/blogsRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
+import doctorRoutes from './routes/doctorRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
 
 dotenv.config();
 const port = process.env.PORT;
@@ -21,9 +23,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // API routes
-app.use('/api/users', userRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/doctor', doctorRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/search', searchRoutes);
+app.use('api/reviews',reviewRoutes)
 
 // Serve the frontend in production
 if (process.env.NODE_ENV === 'production') {
