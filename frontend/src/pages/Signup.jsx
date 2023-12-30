@@ -1,15 +1,16 @@
 import signup from "../assets/images/signup.gif";
+import avatar from "../assets/images/avatar-icon.png";
 import { useDispatch, useSelector } from "react-redux";
 import { useRegisterMutation } from "../slices/userApiSlice/userApiSlice";
 import { setCredentials } from "../slices/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import uploadToCloudinary from "../utils/cloudinary";
 
 const Signup = () => {
-  // const [selectedFile, setSelectedFile] = useState(null);
-  // const [previewURL, setPreviewURL] = useState("");
 
+  const [selectFile, setSelectFile] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,49 +18,35 @@ const Signup = () => {
     cnfPassword: "",
     gender: "",
     role: "patient",
+    photo: selectFile,
   });
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = async(e) => {
+    const file = e.target.files[0]
+    const data = await uploadToCloudinary(file);
+    console.log(data);
+  };
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { userInfo} = useSelector((state) => state.auth);
+  const { userInfo } = useSelector((state) => state.auth);
   const [register, { isLoading }] = useRegisterMutation();
 
-  // const handleFileChange = async(e) => {
-  //   // const file = e.target.files[0];
-  //   // setSelectedFile(file);
-  //   // const fileReader = new FileReader();
-  //   // fileReader.onload = () => {
-  //   //   setPreviewURL(fileReader.result);
-  //   // };
-  //   // fileReader.readAsDataURL(file);
-  //   const file = e.target.files[0];
-  //   console.log(file);
-  // }
-
-  const submitHandler = async(event) => {
+  const submitHandler = async (event) => {
     event.preventDefault();
-    if (formData.password !== formData.cnfPassword) {
-      toast.error("password did not match");
-    } else {
-      try {
-        const res = await register({ ...formData }).unwrap();
-        dispatch(setCredentials({ ...res }));
-      } catch (err) {
-        toast.error(err?.data?.message || err.error);
-      }
-    }
+    console.log(formData)
   };
 
   useEffect(() => {
     if (userInfo) {
       navigate("/");
     }
-  },[userInfo, navigate])
+  }, [userInfo, navigate]);
 
   return (
     <section className="px-5 xl:px-0">
@@ -80,7 +67,7 @@ const Signup = () => {
               <span className="text-primaryColor ml-2">account</span>
             </h3>
 
-            <form onSubmit={submitHandler} >
+            <form onSubmit={submitHandler}>
               <div className="mb-5">
                 <input
                   required
@@ -156,7 +143,7 @@ const Signup = () => {
                 </label>
               </div>
 
-              {/* <div className="mb-5 flex items-center gap-3">
+              <div className="mb-5 flex items-center gap-3">
                 <figure className="w-[60px] h-[60px] rounded-full border-2 border-solid border-primaryColor flex items-center justify-center">
                   <img src={avatar} alt="img" className="w-full rounded-full" />
                 </figure>
@@ -176,7 +163,7 @@ const Signup = () => {
                     Upload Photo
                   </label>
                 </div>
-              </div> */}
+              </div>
 
               <div className="mt-7">
                 <button className="w-full bg-primaryColor text-white text-[18px] leading-[30px] px-4 py-3 rounded-lg">
