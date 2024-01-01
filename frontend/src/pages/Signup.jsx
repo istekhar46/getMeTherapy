@@ -9,8 +9,8 @@ import { toast } from "react-toastify";
 import uploadToCloudinary from "../utils/cloudinary";
 
 const Signup = () => {
-
   const [selectFile, setSelectFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,10 +25,13 @@ const Signup = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = async(e) => {
-    const file = e.target.files[0]
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
     const data = await uploadToCloudinary(file);
-    console.log(data);
+    console.log(data.url);
+    setSelectFile(data.url);
+    setPreviewUrl(data.url);
+    setFormData({ ...formData, photo: data.url });
   };
 
   const dispatch = useDispatch();
@@ -39,14 +42,18 @@ const Signup = () => {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    console.log(formData)
+    // try{
+    //   isLoading = true;
+
+    //   const res = await useRegisterMutation(formData).unwrap();
+    //   dispatch(setCredentials(...res))
+    //   isLoading = false;
+    // }catch(err){
+    //   console.log(err);
+    // }
+    console.log(formData);
   };
 
-  useEffect(() => {
-    if (userInfo) {
-      navigate("/");
-    }
-  }, [userInfo, navigate]);
 
   return (
     <section className="px-5 xl:px-0">
