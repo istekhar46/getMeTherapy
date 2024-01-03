@@ -45,7 +45,7 @@ const authUser = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
 
     // destructure data from the req body...
-    const { name, email, password, role, gender } = req.body;
+    const { name, email, password, role, gender, photo } = req.body;
       // Check if the email exists in both User and Doctor schemas
       const existingUser = await User.findOne({ email });
       const existingDoctor = await Doctor.findOne({ email });
@@ -63,16 +63,8 @@ const registerUser = asyncHandler(async (req, res) => {
             email,
             password, //?this password is hashed in user model with schema method called pre()
             role,
-            gender
-        })
-    }
-    if (role === 'doctor') {
-        user = new Doctor({
-            name,
-            email,
-            password, //?this password is hashed in user model with schema method called pre()
-            role,
-            gender
+            gender,
+            photo,
         })
     }
 

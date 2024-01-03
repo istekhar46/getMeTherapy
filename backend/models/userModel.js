@@ -16,6 +16,9 @@ const userSchema = mongoose.Schema
             },
             gender: { type: String, enum: ["male", "female", "other"] },
             appointments: [{ type: mongoose.Types.ObjectId, ref: "Appointment" }],
+            photo:{
+                type : String,
+            }
         },
         {
             timestamps: true

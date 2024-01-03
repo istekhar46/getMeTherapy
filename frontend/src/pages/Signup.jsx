@@ -40,19 +40,28 @@ const Signup = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [register, { isLoading }] = useRegisterMutation();
 
+  const signup = async()=>{
+    
+  }
+
   const submitHandler = async (event) => {
     event.preventDefault();
-    // try{
-    //   isLoading = true;
-
-    //   const res = await useRegisterMutation(formData).unwrap();
-    //   dispatch(setCredentials(...res))
-    //   isLoading = false;
-    // }catch(err){
-    //   console.log(err);
-    // }
-    console.log(formData);
+    try{
+      const res = await register({...formData}).unwrap();
+      dispatch(setCredentials({...res}))
+      toast.success('Register Success');
+    
+    } catch (error) {
+      toast.error(error?.data?.message || error.error)
+    }
   };
+
+  useEffect(()=>{
+    if(userInfo){
+      navigate("/");
+    }
+  },[userInfo])
+  
 
 
   return (
@@ -173,7 +182,7 @@ const Signup = () => {
               </div>
 
               <div className="mt-7">
-                <button className="w-full bg-primaryColor text-white text-[18px] leading-[30px] px-4 py-3 rounded-lg">
+                <button type="submit" className="w-full bg-primaryColor text-white text-[18px] leading-[30px] px-4 py-3 rounded-lg">
                   Sign Up
                 </button>
               </div>
